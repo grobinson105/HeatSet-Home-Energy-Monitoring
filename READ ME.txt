@@ -6,7 +6,7 @@ STEP 1: Set up the SPI and VNC on the pi
 
 	The temperature sensors and pressure sensor provide analogue data that is processed by an analogue to
 	digital chip (MCP3008). Part of the wiring to the MCP3008 from the pi requires that the GPIO pins that 
-	have SPI functionality are enabled as such.
+	have SPI functionality are enabled.
 
 	It is assumed that the user will want to interface with the pi remotely (e.g. through mobile phone and/or
 	laptop). As such we need to enable VNC.
@@ -19,7 +19,7 @@ STEP 1: Set up the SPI and VNC on the pi
 	difficulties. I started on the Ubuntu OS for the pi but could not get it to work. On Raspian it takes
 	seconds.
 
-STEP 2: Move the Solar_Collector folder to the Documents directory:
+STEP 2: Download the code to a folder titled "Home_BMS" and move the folder to the Documents directory:
 
 	/home/pi/Documents
 
@@ -46,7 +46,7 @@ STEP 3: Mount a USB flashdrive for data logging:
 
 STEP 4: Skip the password on boot
 	
-	We want the solar collector to run as soon as all other system processes have been carried out. As such we
+	We want the home energy monitoring system to run as soon as all other system processes have been carried out. As such we
 	don't want to have a password prompt or else we may find we don't have a keyboard. To avoid this open
 	the terminal and enter:
 
