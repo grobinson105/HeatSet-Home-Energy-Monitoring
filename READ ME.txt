@@ -1,4 +1,4 @@
-HEAT_SET_BMS SOFTWARE USER GUIDE
+HEAT_SET_BMS SOFTWARE SET UP USER GUIDE
 There is a separate userguide for the PCB set up
 
 
