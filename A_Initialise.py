@@ -9,48 +9,48 @@ import datetime as dt
 
 #Core energy generation/storage in building
 boolSolar = True            #Set to true if you are using solar thermal
-boolSolarControl = False    #Will the solar system just be gathering data (FALSE) or will it control the pump?
+boolSolarControl = False    #NOT USED BUT DO NOT CHANGE (setting to TRUE will amend the solar thermal GUI to a control GUI that has not been tested or fully developed)
 boolHeatPump = True         #Set to true if you are using a heat pump
-boolHeatPumpControl = False #Do you want the Pi to be able to turn the HP on and off?
+boolHeatPumpControl = False #NOT USED BUT DO NOT CHANGE
 boolPV = True               #Set to true if you are using photo-voltaic panels
 boolBattery = True          #Set to true if you are using domestic batteries
-MainsVoltage = 230          #230V for UK
+MainsVoltage = 230          #No longer used
 
 #Location of code on Pi
 dbLoc = '/media/usb/' #USE A USB FLASHDRIVE. YOU NEED TO MOUNT THE USB CORRECTLY: SEE https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
 fileLoc = '/home/pi/Documents/Home_BMS/'
 
 #I2C
-I2C_ADC_Address = 0x08   #7 bit I2C address for the sensor reading device
+I2C_ADC_Address = 0x08      #No longer used
 
 #Solar thermal related
 boolPressurised = True      #If you are using a pressurised system (i.e. the solar loop is closed) then set to True - this will impact whether a pressure reading should be taken
 boolImmersion = True        #If your solar tank has an immersion heater element that you want to be controlled by the PI set to True
-SolarFlowPipeIDMM = 15      #Internal diameter (mm) of pipe that flows from the collector to the hot water storage / central heating etc.
+SolarFlowPipeIDMM = 15      #No longer used
 glycol_mix = 25             #Percentage expressed not in demical format e.g. 45% should be entered as 45 not 0.45
 Solar_flow_meter_pulse_rate = 0.25    #Litres of water for each pulse sent
-Solar_thermal_volume_L = 1.9    #Number of litres of water within the solar collector
-Heat_Pump_LperS = 31.8         #Maximum flow rate of heat pump - Litres per second
-pump_voltage = 230          #Solar pump's rated voltage (V)
+Solar_thermal_volume_L = 1.9    #No longer used
+Heat_Pump_LperS = 31.8         #No longer used
+pump_voltage = 230          #No longer used
 solar_coil_loc = 0          #0 = bottom, 1 = mid, 2 = top
 
 #HP related
 PipeOutletDiameterMM = 15   #Internal diameter of outlet pipe from heat pump where temperature and flow rate measurements taken
 boolHPTank = True           #If you are using a thermal store that is heated by the HP then set to True
-HPThermalCapacity = 13      #Enter the thermal output capacity of the heat pump being installed in kWth
-HPVoltage = 230             #Operating voltage of HP
+HPThermalCapacity = 13      #No longer used
+HPVoltage = 230             #No longer used
 HP_flow_meter_pulse_rate = 1    #Litres of water for each pulse sent
-HP_PHEx_L = 0.75            #Litres of water in the plate heat exchange between the HP and home hot water circuit
+HP_PHEx_L = 0.75            #No longer used
 HP_glycol_mix = 25             #Percentage expressed not in demical format e.g. 45% should be entered as 45 not 0.45
 Include_internal_unit_in_COP = False #Only include the internal unit if the system is calibrated to measure flow temperature that can be influenced by the internal unit
 
 #PV related
-PVArrayMaxOutputW = 1800     #Maximum electrical output capacity (We)
+PVArrayMaxOutputW = 1800     #No longer used
 
 #Battery related
-VoltageAtFullCharge = 13    #Voltage of fully charged battery array in series - this should be the voltage difference across the whole array as measured from the positive pole
-VoltageAtMinCharge = 11.5   #Minimum permissible voltage difference between positive and negative poles (as above RE: series)
-InverterVoltageToBAT = 9    #Voltage from inverter to Battery
+VoltageAtFullCharge = 13    #No longer used
+VoltageAtMinCharge = 11.5   #No longer used
+InverterVoltageToBAT = 9    #No longer used
 
 #Screen measurements
 lngScreenHeight = 480 #Pixel height of screen used to display the GUI
