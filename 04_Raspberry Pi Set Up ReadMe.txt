@@ -97,8 +97,15 @@ STEP 6: OBEMS Pulse Server.
 	$ cd /home/pi/Documents/Home_BMS/
 	$ chmod 777 ObemsPulseServer
 	
+STEP 7:	Python libraries
+	
+	Some libraries used in the code may not be present. Below are the list of commands you need to run in the terminal
+	to ensure necessary libraries are present:
+	
+	$ sudo apt-get install python3-pil.imagetk
 
-STEP 7: Finish
+
+STEP 8: Finish
 
 	Reboot the pi (see step 4) and the BMS software should now be running - happy home energy monitoring!
 
