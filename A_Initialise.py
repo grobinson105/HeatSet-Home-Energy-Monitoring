@@ -17,7 +17,7 @@ boolBattery = True          #Set to true if you are using domestic batteries
 MainsVoltage = 230          #No longer used
 
 #Location of code on Pi
-dbLoc = '/media/usb/' #USE A USB FLASHDRIVE. YOU NEED TO MOUNT THE USB CORRECTLY: SEE https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
+dbLoc = '/media/HeatSet_data/' #USE A USB FLASHDRIVE. YOU NEED TO MOUNT THE USB CORRECTLY: SEE https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
 fileLoc = '/home/pi/Documents/Home_BMS/'
 
 #I2C
