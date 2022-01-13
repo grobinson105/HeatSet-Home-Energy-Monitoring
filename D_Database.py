@@ -75,6 +75,11 @@ class manage_database:
         strBatTable = lstBat[0]
         self.lstBatFields = lstBat[1]
 
+        #Zone Info
+        lstZone = create_table_string(dictInstructions, 'ZONE_Inputs')
+        strZoneTable = lstZone[0]
+        self.lstZoneFields = lstZone[1]
+
         if boolExists == False:
             if dictInstructions['User_Inputs']['Solar_Thermal'] == True:
                 self.c.execute(strSolarTable)
@@ -88,10 +93,14 @@ class manage_database:
             if dictInstructions['User_Inputs']['Battery'] == True:
                 self.c.execute(strBatTable)
 
+            if dictInstructions['User_Inputs']['Zone'] == True:
+                self.c.execute(strZoneTable)
+
     def upload_data(self, strTable, arrFields, arrVals):
         if len(arrFields) > 0:
             listLength = len(arrFields) #determine the number of values being provided (allowing for multiple readings to be entered)
             for i in range(0,listLength): #for each item in the fields provided
+                self.check_field_exists(strTable, str(arrFields[i]))
                 if i == 0: #for the first item
                     if listLength > 1:
                         strInsert = "INSERT INTO " + strTable + " (" + str(arrFields[i]) + "," #provide the field name but with the necessary SQL insert string
@@ -133,6 +142,38 @@ class manage_database:
             self.DBConn.execute(strInsert, arrVals) #connect to the database and execute the INSERT with the list arrVals
             self.DBConn.commit() #commit the insertion
             #self.DBConn.close() #close the connection to the database
+
+    def check_table_exists(self, dictInstructions, strTable):
+        strSQL = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='" + strTable + "'"
+        self.c.execute(strSQL)
+        TBL_Count = self.c.fetchone()[0]
+        if TBL_Count == 0:
+            lstDefaults = []
+            lstDefaults.append(dictInstructions['Solar_Inputs']['Defaults']['Database_Table_Name'])
+            lstDefaults.append(dictInstructions['HP_Inputs']['Defaults']['Database_Table_Name'])
+            lstDefaults.append(dictInstructions['PV_Inputs']['Defaults']['Database_Table_Name'])
+            lstDefaults.append(dictInstructions['BAT_Inputs']['Defaults']['Database_Table_Name'])
+            lstDefaults.append(dictInstructions['ZONE_Inputs']['Defaults']['Database_Table_Name'])
+
+            lstTitles = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs', 'ZONE_Inputs']
+
+            for i in range(0, len(lstDefaults)):
+                if lstDefaults[i] == strTable:
+                    strInfo = lstTitles[i]
+                    break
+
+            # Info
+            lstInfo = create_table_string(dictInstructions, strInfo)
+            strTableSQL = lstInfo[0]
+            self.lstFields = lstInfo[1]
+            self.c.execute(strTableSQL)
+
+    def check_field_exists(self, strTable, strField):
+        strSQL = "SELECT COUNT(*) AS CNTREC FROM pragma_table_info('" + strTable + "') WHERE name='" + strField + "'"
+        self.c.execute(strSQL)
+        if self.c.fetchone()[0] == 0:
+            strFieldSQL = "ALTER TABLE " + strTable + " ADD COLUMN " + strField + " TEXT;"
+            self.c.execute(strFieldSQL)
 
     def close_connection(self):
         self.DBConn.close()
@@ -363,6 +404,22 @@ class manage_database:
                 dictInstructions['Solar_Inputs']['GUI_Information']['Heat_load']['Derived_read_times'] = lstReadTimes
                 BMS_thread_lock.release()
 
+            if dictInstructions['User_Inputs']['Zone'] == True:
+                tm_current = dt.datetime.now(tz=timezone.utc)
+                lstLastHR = chk_time.Return_Time_Deltas(tm_current, 60) #Last Hour
+                Wh_solar = 0
+                Wh_HP = 0
+                if dictInstructions['User_Inputs']['Solar_Thermal'] == True:
+                    strField = dictInstructions['Solar_Inputs']['GUI_Information']['Collector_temp']['SQL_Title']
+                    strTable = dictInstructions['Solar_Inputs']['GUI_Information']['Collector_temp']['SQL_Table']
+                    Wh_solar = self.sum_query_between_times(lstLastHR[2], lstLastHR[3], lstLastHR[4], lstLastHR[5], strField, strTable)
+                if dictInstructions['User_Inputs']['Heat_Pump'] == True:
+                    strField = dictInstructions['HP_Inputs']['GUI_Information']['Outlet_Temperature']['SQL_Title']
+                    strTable = dictInstructions['HP_Inputs']['GUI_Information']['Outlet_Temperature']['SQL_Table']
+                    Wh_HP = self.sum_query_between_times(lstLastHR[2], lstLastHR[3], lstLastHR[4], lstLastHR[5], strField, strTable)
+                Wh_Combined = Wh_solar + Wh_HP #As only 1 hour has been looked back the Wh = Wth
+                BMS_GUI.Zone_Gauge.add_gauge_line(Wh_Combined)
+
     def upload_sensors(self, dictInstructions, lstGphInfo):
         arrFields = []
         arrVals = []
@@ -373,8 +430,8 @@ class manage_database:
         BMS_thread_lock = dictInstructions['Threads']['BMS_thread_lock']
         boolPlot = False
 	
-        lstInclude = ['Solar_Thermal', 'Heat_Pump', 'PV', 'Battery']
-        lstTech = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs']
+        lstInclude = ['Solar_Thermal', 'Heat_Pump', 'PV', 'Battery', 'Zone']
+        lstTech = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs', 'ZONE_Inputs']
 
         for i in range(0,len(lstTech)):
             #print(lstTech[i])
@@ -536,7 +593,11 @@ class manage_database:
                             if i == 3:
                                 if boolPlot == True:
                                     BMS_GUI.BAT_Graph.plot_chart(lstDayPlot, strColour, fltIndex, strTitle)
+                            if i == 4:
+                                if boolPlot == True:
+                                    BMS_GUI.Zone_Graph.plot_chart(lstDayPlot, strColour, fltIndex, strTitle)
 
+                self.check_table_exists(dictInstructions, strTable)
                 self.upload_data(strTable, arrFields, arrVals)
                 arrFields = []
                 arrVals = []
@@ -639,7 +700,7 @@ def DB_extract_graph_update_thread(dictInstructions):
 '''
 from A_Initialise import *
 HeatSet_DB = manage_database(dictGlobalInstructions)
-HeatSet_DB.heat_xchange_thread(dictGlobalInstructions)
+#HeatSet_DB.heat_xchange_thread(dictGlobalInstructions)
 #total_heat = HeatSet_DB.sum_data_in_current_day("SOLAR", "Pressure_bar", dictGlobalInstructions)
 #strHours = HeatSet_DB.Hour_Strings()
 #print(strHours)
@@ -656,6 +717,8 @@ lstPV = HeatSet_DB.lstPVFields
 HeatSet_DB.export_CSV('PV', lstPV)
 lstBat = HeatSet_DB.lstBatFields
 HeatSet_DB.export_CSV('Battery', lstBat)
+lstZone = HeatSet_DB.lstZoneFields
+HeatSet_DB.export_CSV('Zone', lstZone)
 
-lstPV = HeatSet_DB.close_connection()
+HeatSet_DB.close_connection()
 '''

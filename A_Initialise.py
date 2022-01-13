@@ -15,6 +15,7 @@ boolHeatPumpControl = False #NOT USED BUT DO NOT CHANGE
 boolPV = True               #Set to true if you are using photo-voltaic panels
 boolBattery = True          #Set to true if you are using domestic batteries
 MainsVoltage = 230          #No longer used
+boolZone = True             #Set to true if you are monitoring a zoned manifold
 
 #Location of code on Pi
 dbLoc = '/media/HeatSet_data/' #USE A USB FLASHDRIVE. YOU NEED TO MOUNT THE USB CORRECTLY: SEE https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
@@ -114,6 +115,12 @@ lstBATSensors = [['DictID=0', 'Watts_from_Wh', 'Discharge_Supply', 'BAT_Inputs',
                 ['DictID=2', 'Watts_from_Wh', 'Charge_Supply', 'BAT_Inputs','Pulse_Minute_Readings', 'Pulse_reading_times'],                 #Export from inverter to house
                 ['DictID=3', 13, 1]]                                            #GPIO for electricity meter pulse (import), Wh per pulse (https://www.camax.co.uk/downloads/A100C-Datasheet.pdf)
 
+lstZONESensors = [['DictID=0','light_sensor', 0,1,2,0],                           #Zone 1 sensor
+                ['DictID=1','light_sensor', 0,1,3,1],                           #Zone 2 sensor
+                ['DictID=2','light_sensor', 0,1,4,2],                           #Zone 3 sensor
+                ['DictID=3','light_sensor', 0,1,5.3],                           #Zone 4 sensor
+                ['DictID=3','light_sensor', 0,1,6.4]]                           #Zone 5 sensor
+
 #For pulse meter mapping to Obems C++ server
 lstObemsHeatSet_GPIOMap = [['Solar_Inputs', 20, 'pc00'], #Solar flow meter, [Technolgy type, ID in GUI information, Obems server command]
                             ['Solar_Inputs',21, 'pc01'], #Solar electricity sub-meter
@@ -134,6 +141,7 @@ dictUser = {'Solar_Thermal': boolSolar,
                         'Heat_Pump_Control': boolHeatPumpControl,
                         'PV': boolPV,
                         'Battery': boolBattery,
+                        'Zone': boolZone,
                         'DB_Location': dbLoc,
                         'Code_Location': fileLoc,
                         'Pressurised': boolPressurised,
@@ -1637,6 +1645,247 @@ dictGlobalBAT = {'GUI_Information': dictGlobalBATGUI,
                                 'Graph_params': dict_BAT_Graph_Instructions,
                                 'Gauge_params': dict_BAT_Instructions}
 
+#############################################
+'''ZONE SYSTEM PARAMETERS'''
+#############################################
+
+#SQL TABLE
+strZONESQLTable = 'ZONE'
+
+#GUI Defaults
+imgZONELogo = fileLoc + "LOGO.png" #location of the Heat Set logo
+dictZONEDefaults = {'Logo': imgZONELogo,
+                    'Database_Table_Name': strZONESQLTable,
+                    'Interface_function': ''}
+
+#GUI Information relating to sensors
+dictZone1 = {'ID': 0,
+                        'Include?': True,
+                        'SQL_Table': strZONESQLTable,
+                        'SQL_Title': 'Zone_1A',
+                        'GUI_Label': 'Zone 1: Kitchen',
+                        'GUI_Val': None,
+                        'GUI_Default': str(0),
+                        'Sensor': False,
+                        'Interface_function': lstZONESensors[0][1],
+                        'Interface_args': lstZONESensors[0][2:],
+                        'Sensor_Read_Times': None,
+                        'Minute_Average': None,
+                        'Pulse_Meter': False,
+                        'Derived_Val': False,
+                        'Plot_Values?': True,
+                        'Plot_Value_List': [],
+                        'Plot_index': 1,
+                        'Plot_colour': 'red',
+                        'Plot_label': 'Zone 1'}
+
+dictZone2 = {'ID': 1,
+                        'Include?': True,
+                        'SQL_Table': strZONESQLTable,
+                        'SQL_Title': 'Zone_2',
+                        'GUI_Label': 'Zone 2: Study',
+                        'GUI_Val': None,
+                        'GUI_Default': str(0),
+                        'Sensor': False,
+                        'Interface_function': lstZONESensors[1][1],
+                        'Interface_args': lstZONESensors[1][2:],
+                        'Sensor_Read_Times': None,
+                        'Minute_Average': None,
+                        'Pulse_Meter': False,
+                        'Derived_Val': False,
+                        'Plot_Values?': True,
+                        'Plot_Value_List': [],
+                        'Plot_index': 2,
+                        'Plot_colour': 'blue',
+                        'Plot_label': 'Zone 2'}
+
+dictZone3 = {'ID': 2,
+                        'Include?': True,
+                        'SQL_Table': strZONESQLTable,
+                        'SQL_Title': 'Zone_3',
+                        'GUI_Label': 'Zone 3: Front Room',
+                        'GUI_Val': None,
+                        'GUI_Default': str(0),
+                        'Sensor': False,
+                        'Interface_function': lstZONESensors[2][1],
+                        'Interface_args': lstZONESensors[2][2:],
+                        'Sensor_Read_Times': None,
+                        'Minute_Average': None,
+                        'Pulse_Meter': False,
+                        'Derived_Val': False,
+                        'Plot_Values?': True,
+                        'Plot_Value_List': [],
+                        'Plot_index': 3,
+                        'Plot_colour': 'green',
+                        'Plot_label': 'Zone 3'}
+
+dictZone4 = {'ID': 3,
+                        'Include?': True,
+                        'SQL_Table': strZONESQLTable,
+                        'SQL_Title': 'Zone_4',
+                        'GUI_Label': 'Zone 4: Radiators',
+                        'GUI_Val': None,
+                        'GUI_Default': str(0),
+                        'Sensor': False,
+                        'Interface_function': lstZONESensors[3][1],
+                        'Interface_args': lstZONESensors[3][2:],
+                        'Sensor_Read_Times': None,
+                        'Minute_Average': None,
+                        'Pulse_Meter': False,
+                        'Derived_Val': False,
+                        'Plot_Values?': True,
+                        'Plot_Value_List': [],
+                        'Plot_index': 4,
+                        'Plot_colour': 'purple',
+                        'Plot_label': 'Zone 4'}
+
+dictZone5= {'ID': 4,
+                        'Include?': False,
+                        'SQL_Table': strZONESQLTable,
+                        'SQL_Title': 'Zone_5',
+                        'GUI_Label': 'Zone 5: Hot Water',
+                        'GUI_Val': None,
+                        'GUI_Default': str(0),
+                        'Sensor': False,
+                        'Interface_function': lstZONESensors[4][1],
+                        'Interface_args': lstZONESensors[4][2:],
+                        'Sensor_Read_Times': None,
+                        'Minute_Average': None,
+                        'Pulse_Meter': False,
+                        'Derived_Val': False,
+                        'Plot_Values?': True,
+                        'Plot_Value_List': [],
+                        'Plot_index': 5,
+                        'Plot_colour': 'black',
+                        'Plot_label': 'Zone 5'}
+
+
+dictGlobalZONEGUI = {'Zone_1': dictZone1,
+                        'Zone_2': dictZone2,
+                        'Zone_3': dictZone3,
+                        'Zone_4': dictZone4,
+                        'Zone_5': dictZone5}
+
+lstGUIZONESensorNoADJ = [0, 1, 2, 3, 4] #Measured values on the GUI so not adjusted by the user
+lstGUIZONESections = [lstGUIZONESensorNoADJ]
+
+#ZONE TAB SIZING
+frmZONESensorsHeightDefault = 150
+frmZONESensorsWidthDefault = frmLogoWidthDefault
+frmZONESensorsHeight = frmZONESensorsHeightDefault * lngScreenHeightADJ
+frmZONESensorsWidth = frmZONESensorsWidthDefault * lngScreenWidthADJ
+frmZONESensors_x = 0
+frmZONESensors_y = frmLogoHeight
+
+dictZONESensors = {'SensorFm_height': frmZONESensorsHeight,
+                        'SensorFm_width': frmZONESensorsWidth,
+                        'Sensor_x': frmZONESensors_x,
+                        'Sensor_y': frmZONESensors_y}
+
+frmZONEGraphHeight = lngScreenHeight
+frmZONEGraphWidth = lngScreenWidth - frmLogoWidth
+frmZONEGraph_x = frmZONESensorsWidth
+frmZONEGraph_y = 0
+
+dictZONEGraph = {'GraphFm_height': frmZONEGraphHeight,
+                        'GraphFm_width': frmZONEGraphWidth,
+                        'Graph_x': frmZONEGraph_x,
+                        'Graph_y': frmZONEGraph_y}
+
+frmZONEGaugeHeightDefault = lngScreenDesignHeight - frmZONESensorsHeightDefault - frmLogoHeightDefault
+frmZONEGaugeHeight = frmZONEGaugeHeightDefault * lngScreenHeightADJ
+frmZONEGaugeWidthDefault = frmLogoWidthDefault
+frmZONEGaugeWidth = frmZONEGaugeWidthDefault * lngScreenWidthADJ
+frmZONEGauge_x = 0
+frmZONEGauge_y = frmLogoHeight + frmZONESensorsHeight
+
+dictZONEGauge = {'Fm_height': frmZONEGaugeHeight, 'Fm_width': frmZONEGaugeWidth, 'Gauge_x': frmZONEGauge_x, 'Gauge_y': frmZONEGauge_y}
+dictZONEGUIParams = {'Sensor_Section': dictZONESensors, 'Graph_Section': dictZONEGraph, 'Gauge_Section': dictZONEGauge}
+
+#ZONE GRAPH
+frm_ZONE_Graph_bd = 1
+bx_ZONE_Graph_width = frmZONEGraphWidth
+bx_ZONE_Graph_height = frmZONEGraphHeight-40
+bx_ZONE_Graph_x0 = 0
+bx_ZONE_Graph_y0 = 0
+tm_ZONE_Graph_length = 5 #pixel length of the minor tm line
+tm_ZONE_Graph_major_length = 10 #pixel length of the major tm line
+tm_ZONE_Graph_x_count = 24*2 #Show tickmarks each half hour
+tm_ZONE_Graph_x_major = 2 #Show major tm on the hour
+ZONE_Graph_x_max = 24 #maximum value of x axis is 24th hour
+ZONE_Graph_x_min = 0 #minimum value on the x axis in the 0th hour
+tm_ZONE_Graph_y_count = 5 #One for each zone
+tm_ZONE_Graph_y_major= 1 #Show major tm for each zone
+ZONE_Graph_y_max = 5  #One for each zone
+ZONE_Graph_y_min = 0 #0 referring to off position for any given zone
+frm_ZONE_Graph_title = 'Heating zones on/off: ' + strftime("%d/%m/%Y", gmtime())
+boolGrid_ZONE_Graph = True
+ZONE_Graph_x_title = 'Time (hour of day)'
+ZONE_Graph_y_title = 'Zones (0 = off)'
+
+dict_ZONE_Graph_Frame_Dims = {'frm_width': frmZONEGraphWidth,
+                                'frm_height': frmZONEGraphHeight,
+                                'frm_bd': frm_ZONE_Graph_bd,
+                                'bx_width': bx_ZONE_Graph_width,
+                                'bx_height': bx_ZONE_Graph_height,
+                                'bx_x0': bx_ZONE_Graph_x0,
+                                'bx_y0': bx_ZONE_Graph_y0}
+dict_ZONE_Graph_Values = {'include_grid': boolGrid_ZONE_Graph,
+                                'graph_x_title': ZONE_Graph_x_title,
+                                'graph_x_max': ZONE_Graph_x_max,
+                                'graph_x_min': ZONE_Graph_x_min,
+                                'graph_y_title': ZONE_Graph_y_title,
+                                'graph_y_max': ZONE_Graph_y_max,
+                                'graph_y_min': ZONE_Graph_y_min,
+                                'tm_length': tm_ZONE_Graph_length,
+                                'tm_x_count': tm_ZONE_Graph_x_count,
+                                'tm_x_major': tm_ZONE_Graph_x_major,
+                                'tm_y_count': tm_ZONE_Graph_y_count,
+                                'tm_y_major': tm_ZONE_Graph_y_major,
+                                'tm_major_length': tm_ZONE_Graph_major_length,
+                                'frm_title':frm_ZONE_Graph_title}
+dict_ZONE_Graph_Instructions = {'Dimensions': dict_ZONE_Graph_Frame_Dims, 'Values': dict_ZONE_Graph_Values}
+
+#ZONE Array GAUGE
+frm_ZONE_Gauge_bd = 11
+bx_ZONE_Gauge_width = frmZONEGaugeWidth
+bx_ZONE_Gauge_height = frmZONEGaugeWidth #the box height needs to be the same height as the width as this is to draw a full circle
+bx_ZONE_Gauge_x0 = 0
+bx_ZONE_Gauge_y0 = 0
+tm_ZONE_Gauge_length = 5
+tm_ZONE_Gauge_major_length = 10
+tm_ZONE_Gauge_count = 80
+tm_ZONE_Gauge_major = 10
+gauge_max_ZONE_Gauge = 8000
+gauge_min_ZONE_Gauge = 0
+frm_ZONE_Gauge_title = 'HP+Solar Wth'
+
+dict_ZONE_Gauge_Frame_Dims = {'frm_width': frmZONEGaugeWidth,
+                                'frm_height': frmZONEGaugeHeight,
+                                'frm_bd': frm_ZONE_Gauge_bd,
+                                'bx_width': bx_ZONE_Gauge_width,
+                                'bx_height': bx_ZONE_Gauge_height,
+                                'bx_x0': bx_ZONE_Gauge_x0,
+                                'bx_y0': bx_ZONE_Gauge_y0}
+dict_ZONE_Gauge_Values = {'gauge_max': gauge_max_ZONE_Gauge,
+                                'gauge_min': gauge_min_ZONE_Gauge,
+                                'tm_length': tm_ZONE_Gauge_length,
+                                'tm_count': tm_ZONE_Gauge_count,
+                                'tm_major': tm_ZONE_Gauge_major,
+                                'tm_major_length': tm_ZONE_Gauge_major_length,
+                                'frm_title':frm_ZONE_Gauge_title}
+dict_ZONE_Instructions = {'Dimensions': dict_ZONE_Gauge_Frame_Dims, 'Values': dict_ZONE_Gauge_Values}
+
+dictGlobalZONE = {'GUI_Information': dictGlobalZONEGUI,
+                                'GUI_Sections': lstGUIZONESections,
+                                'GPIOs': None,
+                                'GUI_Commands': None,
+                                'Defaults': dictZONEDefaults,
+                                'GUI_params': dictZONEGUIParams,
+                                'Graph_params': dict_ZONE_Graph_Instructions,
+                                'Gauge_params': dict_ZONE_Instructions}
+
+
 dictGlobalInstructions = {'User_Inputs': dictUser,
                             'General_Inputs': dictCommonGUIParams,
                             'Threads': dictThreads,
@@ -1644,4 +1893,5 @@ dictGlobalInstructions = {'User_Inputs': dictUser,
                             'HP_Inputs': dictGlobalHP,
                             'PV_Inputs': dictGlobalPV,
                             'BAT_Inputs': dictGlobalBAT,
+                            'ZONE_Inputs': dictGlobalZONE,
                             'Database': None}

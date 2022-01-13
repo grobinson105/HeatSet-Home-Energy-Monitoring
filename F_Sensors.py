@@ -206,12 +206,30 @@ def pressure_5V_via_MCP3008(lstArgs):
     fltBar = fltInterpolatedPSI * 0.0689476 #conversion of PSI to bar
     return fltBar
 
+def light_sensor(lstArgs):
+
+    SPIBus = lstArgs[0]
+    SPIChannel = lstArgs[1]
+    MCP3008_Channel = lstArgs[2]
+    Zone_ID = lstArgs[3]
+
+    Vref = 3.3 #MCP3008 Vref and Vdd when connected to the Pi via SPI
+    voltage = read_MCP3008_SPI(SPIBus, SPIChannel, MCP3008_Channel, Vref)
+    #print(voltage)
+    R1_ohm = R1_resistance_OHM(10000, Vref, voltage) #Resistor 2 on HeatSet PCB = 10k ohm    #print(R1_ohm)
+    #print(R1_ohm)
+    Resistance_ON = 2000 #The resistance of the photoresistor will be different for different LED lights so this needs to be calbirated but need not be exact
+    if R1_ohm >= Resistance_ON: #Photo resistors have a lower resistance with greater light intensity
+        return Zone_ID + 1 #The graph will plot a straight line against each zone
+    else:
+        return 0
+
 def run_sensors(dictGlobalInstructions):
     #time.sleep(20)
     BMS_GUI = dictGlobalInstructions['General_Inputs']['GUI_BMS']
     BMS_thread_lock = dictGlobalInstructions['Threads']['BMS_thread_lock']
-    lstInclude = ['Solar_Thermal', 'Heat_Pump', 'PV', 'Battery']
-    lstTech = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs']
+    lstInclude = ['Solar_Thermal', 'Heat_Pump', 'PV', 'Battery', 'Zone']
+    lstTech = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs', 'ZONE_Inputs']
 
     for i in range(0,len(lstTech)):
         if dictGlobalInstructions['User_Inputs'][lstInclude[i]] == True: #If the technology is included
@@ -221,6 +239,7 @@ def run_sensors(dictGlobalInstructions):
                     if dictGlobalInstructions[lstTech[i]]['GUI_Information'][key]['Sensor'] == True: #If the item selected is a sensor
                         strInterfaceFunction = dictGlobalInstructions[lstTech[i]]['GUI_Information'][key]['Interface_function'] #The function to read the sensor. This is user defined allowing for alternative approaches - the default is the HeatSet PCB that uses an analog 10k thermistor
                         lstArgs = dictGlobalInstructions[lstTech[i]]['GUI_Information'][key]['Interface_args'] #The arguments for the function
+                        lstArgs.append([dictGlobalInstructions[lstTech[i]]['GUI_Information'][key]['ID']])
                         #print(dictGlobalInstructions[lstTech[i]]['GUI_Information'][key]['ID'])
                         #print(strInterfaceFunction)
                         #print(lstArgs)

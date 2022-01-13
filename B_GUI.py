@@ -300,6 +300,11 @@ class build_GUI:
             self.TAB_CONTROL.add(self.BAT_Tab, text='Battery')
             self.populate_BAT_tab(dictInstructions)
 
+        if dictInstructions['User_Inputs']['Zone'] == True:
+            self.ZONE_Tab = ttk.Frame(self.TAB_CONTROL)
+            self.TAB_CONTROL.add(self.ZONE_Tab, text='Zones')
+            self.populate_ZONE_tab(dictInstructions)
+
         self.TAB_CONTROL.pack(expand=1, fill="both")
         self.time_created = dt.datetime.now()
 
@@ -1019,12 +1024,134 @@ class build_GUI:
         self.BAT_Graph = cht_plt.GUI_graph(dictInstructions['BAT_Inputs']['Graph_params'], self.frmBATGraph)
         self.BAT_Gauge = cht_plt.GUI_gauge(dictInstructions['BAT_Inputs']['Gauge_params'], self.frmBATGauge)
 
-    def solar_pump_thread(self):
-        if self.created_self == True:
-            self.solar_pump = pump.manage_solar_pump(dictGlobalInstructions, HeatSet_DB)
-            while self.solar_pump.quit_sys == False and self.quit_sys == False:
-                solar_pump.pump_on_off_decision(dictGlobalInstructions, HeatSet_DB)
-                time.sleep(1) #Wait one second
+    def populate_ZONE_tab(self, dictInstructions):
+        #CREATE KEY FORMS WITHIN TAB
+        self.frmZoneLogo = Frame(self.ZONE_Tab, pady=5, padx=5, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        #self.frmPVLogo.bind('<Button>', cmd_lightUp)
+        self.frmZoneLogo.pack()
+        self.frmZoneLogo.place(y=dictInstructions['General_Inputs']['Logo_y'],
+                                    x=dictInstructions['General_Inputs']['Logo_x'],
+                                    height=dictInstructions['General_Inputs']['Logo_height'],
+                                    width=dictInstructions['General_Inputs']['Logo_width'])
+
+        self.frmZoneSensors = Frame(self.ZONE_Tab, pady=5, padx=5, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        #frmPVSensors.bind('<Button>', cmd_lightUp)
+        self.frmZoneSensors.pack()
+        self.frmZoneSensors.place(y=dictInstructions['ZONE_Inputs']['GUI_params']['Sensor_Section']['Sensor_y'],
+                                    x=dictInstructions['ZONE_Inputs']['GUI_params']['Sensor_Section']['Sensor_x'],
+                                    height=dictInstructions['ZONE_Inputs']['GUI_params']['Sensor_Section']['SensorFm_height'],
+                                    width = dictInstructions['ZONE_Inputs']['GUI_params']['Sensor_Section']['SensorFm_width'])
+
+        self.frmZoneGraph = Frame(self.ZONE_Tab, pady=5, padx=5, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        #frmSolarGraph.bind('<Button>',cmd_lightUp)
+        self.frmZoneGraph.pack()
+        self.frmZoneGraph.place(y=dictInstructions['ZONE_Inputs']['GUI_params']['Graph_Section']['Graph_y'],
+                                    x=dictInstructions['ZONE_Inputs']['GUI_params']['Graph_Section']['Graph_x'],
+                                    height=dictInstructions['ZONE_Inputs']['GUI_params']['Graph_Section']['GraphFm_height'],
+                                    width = dictInstructions['ZONE_Inputs']['GUI_params']['Graph_Section']['GraphFm_width'])
+
+        self.frmZoneGauge = Frame(self.ZONE_Tab, pady=5, padx=5, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        #frmSolarGraph.bind('<Button>',cmd_lightUp)
+        self.frmZoneGauge.pack()
+        self.frmZoneGauge.place(y=dictInstructions['ZONE_Inputs']['GUI_params']['Gauge_Section']['Gauge_y'],
+                                    x=dictInstructions['ZONE_Inputs']['GUI_params']['Gauge_Section']['Gauge_x'],
+                                    height=dictInstructions['ZONE_Inputs']['GUI_params']['Gauge_Section']['Fm_height'],
+                                    width = dictInstructions['ZONE_Inputs']['GUI_params']['Gauge_Section']['Fm_width'])
+
+        # Place HeatSet Logo
+        strImageLoc = str(dictInstructions['ZONE_Inputs']['Defaults']['Logo'])
+        self.tkZoneImage = ImageTk.PhotoImage(Image.open(strImageLoc))
+        self.lblZoneImgLogo = Label(self.frmZoneLogo, image=self.tkZoneImage)
+        #lblLogo.bind('<Button>',cmd_lightUp)
+        self.lblZoneImgLogo.pack(side = "bottom", fill = "both", expand = "yes")
+        self.lblZoneImgLogo.place(x=0,y=0)
+
+        #Set up restart button
+        self.btnZoneRestart = Button(self.frmZoneLogo,
+                                    text="RESTART",
+                                    font=(dictInstructions['General_Inputs']['Font'],
+                                            dictInstructions['General_Inputs']['Font_size']),
+                                    command=self.restart_GUI)
+        #btnRestart.bind('<Button>',cmd_lightUp)
+        lngZoneFreeSapce = dictInstructions['General_Inputs']['Logo_width'] - 160 #Logo width
+        lngZoneRestartWidth = lngZoneFreeSapce / 3
+        self.btnZoneRestart.place(y=dictInstructions['General_Inputs']['Logo_y'],
+                                    x=dictInstructions['General_Inputs']['Logo_width'] - lngZoneRestartWidth - 10,
+                                    height = 40 * dictInstructions['General_Inputs']['Height_ADJ'],
+                                    width = lngZoneRestartWidth)
+
+        self.btnZoneQuit = Button(self.frmZoneLogo,
+                                    text="QUIT",
+                                    font=(dictInstructions['General_Inputs']['Font'],
+                                            dictInstructions['General_Inputs']['Font_size']),
+                                    command=self.quit_GUI)
+        #self.btnSolarQuit.bind('<Button>',cmd_lightUp)
+        self.btnZoneQuit.place(y=dictInstructions['General_Inputs']['Logo_y'],
+                                    x=dictInstructions['General_Inputs']['Logo_width'] - lngZoneRestartWidth * 2 - 10,
+                                    height = 40 * dictInstructions['General_Inputs']['Height_ADJ'],
+                                    width = lngZoneRestartWidth)
+
+       # Sensor  section relative measurements
+        self.lstZoneSensOrderByID = dictInstructions['ZONE_Inputs']['GUI_Sections'][0]
+        self.frmZoneSensorHeight = dictInstructions['ZONE_Inputs']['GUI_params']['Sensor_Section']['SensorFm_height']
+        self.frmZoneSensorsWidth = dictInstructions['ZONE_Inputs']['GUI_params']['Sensor_Section']['SensorFm_width']
+
+        SensCounter = 0
+        for key in dictInstructions['ZONE_Inputs']['GUI_Information']:
+            for i in range(0, len(self.lstZoneSensOrderByID)):
+                if dictInstructions['ZONE_Inputs']['GUI_Information'][key]['ID'] == self.lstZoneSensOrderByID[i]:
+                    if dictInstructions['ZONE_Inputs']['GUI_Information'][key]['Include?'] == True:
+                        SensCounter += 1
+
+        self.dblZoneSensHeight = int((self.frmZoneSensorHeight-10) / SensCounter)
+        self.dblZoneSensWidthLBL = int((self.frmZoneSensorsWidth-10) * 2/3)
+        self.dblZoneSensWidthVal = int((self.frmZoneSensorsWidth-10) * 1/3)
+
+        SensCounter = 0
+        # Create sensor section labels and outputs and update global dictionary
+        for i in range(0, len(self.lstZoneSensOrderByID)): #Loop through all of the global library lists as calibrated within System_Initialize
+            boolContinue = False
+            for key in dictInstructions['ZONE_Inputs']['GUI_Information']:
+                if boolContinue == True:
+                    continue
+                if dictInstructions['ZONE_Inputs']['GUI_Information'][key]['ID'] == self.lstZoneSensOrderByID[i]: #if the ID of the library item
+                    if dictInstructions['ZONE_Inputs']['GUI_Information'][key]['Include?'] == True:
+                        lblTitle = Label(self.frmZoneSensors,
+                                        text=dictInstructions['ZONE_Inputs']['GUI_Information'][key]['GUI_Label'],
+                                        font=(dictInstructions['General_Inputs']['Font'],
+                                                dictInstructions['General_Inputs']['Font_size']),
+                                        anchor=W) #This is the label that provides the description to the value
+                        #lblTitle.bind('<Button>', cmd_lightUp)
+                        lblTitle.place(y=(self.dblZoneSensHeight * SensCounter),
+                                        x=5,
+                                        height=self.dblZoneSensHeight,
+                                        width=self.dblZoneSensWidthLBL)
+                        lblVal = Label(self.frmZoneSensors,
+                                        text=dictInstructions['ZONE_Inputs']['GUI_Information'][key]['GUI_Default'],
+                                        font=(dictInstructions['General_Inputs']['Font'],
+                                                dictInstructions['General_Inputs']['Font_size']),
+                                        relief=SUNKEN)
+                        #lblVal.bind('<Button>', cmd_lightUp)
+                        lblVal.place(y=(self.dblZoneSensHeight * SensCounter),
+                                        x=self.dblZoneSensWidthLBL,
+                                        height=self.dblZoneSensHeight,
+                                        width = self.dblZoneSensWidthVal)
+                        dictInstructions['ZONE_Inputs']['GUI_Information'][key]['GUI_Val'] = lblVal # Local level insturctions
+                        dictGlobalInstructions['ZONE_Inputs']['GUI_Information'][key]['GUI_Val'] = lblVal # Module level instructions
+                        boolContinue = True
+                        SensCounter += 1
+                        continue
+
+        #Insert PV Graph and gauge
+        self.Zone_Graph = cht_plt.GUI_graph(dictInstructions['ZONE_Inputs']['Graph_params'], self.frmZoneGraph)
+        self.Zone_Gauge = cht_plt.GUI_gauge(dictInstructions['ZONE_Inputs']['Gauge_params'], self.frmZoneGauge)
+
+#    def solar_pump_thread(self):
+#        if self.created_self == True:
+#            self.solar_pump = pump.manage_solar_pump(dictGlobalInstructions, HeatSet_DB)
+#            while self.solar_pump.quit_sys == False and self.quit_sys == False:
+#                solar_pump.pump_on_off_decision(dictGlobalInstructions, HeatSet_DB)
+#                time.sleep(1) #Wait one second
 
     def sensors_thread(self):
         if self.created_self == True:
@@ -1069,8 +1196,8 @@ class build_GUI:
     def day_plot_reset_thread(self):
         if self.created_self == True:
             BMS_thread_lock = dictGlobalInstructions['Threads']['BMS_thread_lock']
-            lstInclude = ['Solar_Thermal', 'Heat_Pump', 'PV', 'Battery']
-            lstTech = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs']
+            lstInclude = ['Solar_Thermal', 'Heat_Pump', 'PV', 'Battery', 'Zone']
+            lstTech = ['Solar_Inputs', 'HP_Inputs', 'PV_Inputs', 'BAT_Inputs', 'ZONE_Inputs']
 
             while self.quit_sys == False:
                 current_minute = chk_time.return_abs_minute_in_day()
@@ -1094,6 +1221,8 @@ class build_GUI:
                         self.PV_Graph.update_graph_title('Electrical output (Wh/min): ' + strftime("%d/%m/%Y", gmtime()))
                     if dictGlobalInstructions['User_Inputs']['Battery'] == True:
                         self.BAT_Graph.update_graph_title('Charge/Discharge (Wh/min): ' + strftime("%d/%m/%Y", gmtime()))
+                    if dictGlobalInstructions['User_Inputs']['Zone'] == True:
+                        self.Zone_Graph.update_graph_title('Heating zones on/off: ' + strftime("%d/%m/%Y", gmtime()))
 
                 time.sleep(20)
 
