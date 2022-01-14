@@ -245,6 +245,11 @@ def run_sensors(dictGlobalInstructions):
                         #print(lstArgs)
                         time.sleep(0.005) #Wait 5 microseconds (allowing the MCP3008 to complete A2D conversion)
                         fltOutput = globals()[strInterfaceFunction](lstArgs) #Run the function to get a float output
+                        if i == 4: #For Zone outputs
+                            if fltOutput > 0:
+                                fltOutput = "ON"
+                            else:
+                                fltOutput = "OFF"
                         dtReadTime = dt.datetime.now() #Record the current time
 
                         if dictGlobalInstructions[lstTech[i]]['GUI_Information'][key]['Minute_Average'] == None: #If this is the first read on GUI initialisation

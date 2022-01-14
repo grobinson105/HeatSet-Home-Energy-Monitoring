@@ -410,12 +410,12 @@ class manage_database:
                 Wh_solar = 0
                 Wh_HP = 0
                 if dictInstructions['User_Inputs']['Solar_Thermal'] == True:
-                    strField = dictInstructions['Solar_Inputs']['GUI_Information']['Collector_temp']['SQL_Title']
-                    strTable = dictInstructions['Solar_Inputs']['GUI_Information']['Collector_temp']['SQL_Table']
+                    strField = dictInstructions['Solar_Inputs']['GUI_Information']['Heat_load']['SQL_Title']
+                    strTable = dictInstructions['Solar_Inputs']['GUI_Information']['Heat_load']['SQL_Table']
                     Wh_solar = self.sum_query_between_times(lstLastHR[2], lstLastHR[3], lstLastHR[4], lstLastHR[5], strField, strTable)
                 if dictInstructions['User_Inputs']['Heat_Pump'] == True:
-                    strField = dictInstructions['HP_Inputs']['GUI_Information']['Outlet_Temperature']['SQL_Title']
-                    strTable = dictInstructions['HP_Inputs']['GUI_Information']['Outlet_Temperature']['SQL_Table']
+                    strField = dictInstructions['HP_Inputs']['GUI_Information']['Heat_load']['SQL_Title']
+                    strTable = dictInstructions['HP_Inputs']['GUI_Information']['Heat_load']['SQL_Table']
                     Wh_HP = self.sum_query_between_times(lstLastHR[2], lstLastHR[3], lstLastHR[4], lstLastHR[5], strField, strTable)
                 Wh_Combined = Wh_solar + Wh_HP #As only 1 hour has been looked back the Wh = Wth
                 BMS_GUI.Zone_Gauge.add_gauge_line(Wh_Combined)
@@ -691,6 +691,10 @@ def DB_extract_graph_update_thread(dictInstructions):
             if dictInstructions['User_Inputs']['Battery'] == True:
                 lstBat = HeatSet_DB.lstBatFields
                 HeatSet_DB.export_CSV('Battery', lstBat)
+
+            if dictInstructions['User_Inputs']['Zone'] == True:
+                lstBat = HeatSet_DB.lstZoneFields
+                HeatSet_DB.export_CSV('Zone', lstBat)
 
         time.sleep(5)
         #print('Current Loop: ' + str(bytCurrentLoop) + ', Previous Minute: ' + str(intPrevMin))
