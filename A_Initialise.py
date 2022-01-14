@@ -18,7 +18,7 @@ MainsVoltage = 230          #No longer used
 boolZone = True             #Set to true if you are monitoring a zoned manifold
 
 #Location of code on Pi
-dbLoc = '/media/HeatSet_data/' #USE A USB FLASHDRIVE. YOU NEED TO MOUNT THE USB CORRECTLY: SEE https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
+dbLoc = '/media/HeatSet_BMS/' #USE A USB FLASHDRIVE. YOU NEED TO MOUNT THE USB CORRECTLY: SEE https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
 fileLoc = '/home/pi/Documents/Home_BMS/'
 
 #I2C
