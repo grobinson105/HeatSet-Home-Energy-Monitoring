@@ -450,7 +450,13 @@ class manage_database:
                                 BMS_thread_lock.release()
                                 fltTotalVal = 0
                                 for j in range(2,len(lstLastMin)): #The first 'bit' of lstLastMin is whether the data has been downloaded; the second 'bit' is from the previous minute
-                                    fltTotalVal = fltTotalVal + lstLastMin[j]
+                                    if i != 4: #Not zone data
+                                        fltTotalVal = fltTotalVal + lstLastMin[j]
+                                    else: #For Zones - if it's been on when read then add 1 or else add zero. Av. will provide % over minute
+                                        if fltTotalVal == "ON":
+                                            fltTotalVal = 1 + fltTotalVal
+                                        else:
+                                            fltTotalVal = 0 + fltTotalVal
                                 avOutput = fltTotalVal / (len(lstLastMin) - 2)
                                 arrVals.append(avOutput)
                                 lstLastMin[0] = True
