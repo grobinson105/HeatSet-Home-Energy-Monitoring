@@ -904,7 +904,7 @@ dictHPThermalCapacity = {'ID': 3,
                         'Include?': True,
                         'SQL_Table': strHPSQLTable,
                         'SQL_Title': 'HP_Thermal_Capacity_Wth',
-                        'GUI_Label': 'Thermal capacity (Wth)',
+                        'GUI_Label': 'Thermal capacity (Wth) over last 5mins',
                         'GUI_Val': None,
                         'GUI_Default': str(0),
                         'Sensor': False,
@@ -1169,9 +1169,9 @@ tm_HP_Graph_x_count = 24*2 #Show tickmarks each half hour
 tm_HP_Graph_x_major = 2 #Show major tm on the hour
 HP_Graph_x_max = 24 #maximum value of x axis is 24th hour
 HP_Graph_x_min = 0 #minimum value on the x axis in the 0th hour
-tm_HP_Graph_y_count = 60 #Maximum on graph assumes no more than 10 hours @ maximum capacity (which would be excessive!)
-tm_HP_Graph_y_major= 2 #Show major tm for every Wh
-HP_Graph_y_max = 30000 #Maximum wh per day
+tm_HP_Graph_y_count = 70 #Maximum on graph assumes no more than 10 hours @ maximum capacity (which would be excessive!)
+tm_HP_Graph_y_major= 10 #Show major tm for every Wh
+HP_Graph_y_max = 70000 #Maximum wh per day
 HP_Graph_y_min = 0 #Minimum capacity on y-axisis 0 kWh
 frm_HP_Graph_title = 'Thermal output and electrical input: ' + strftime("%d/%m/%Y", gmtime())
 boolGrid_HP_Graph = True
@@ -1662,7 +1662,7 @@ dictZONEDefaults = {'Logo': imgZONELogo,
 dictZone1 = {'ID': 0,
                         'Include?': True,
                         'SQL_Table': strZONESQLTable,
-                        'SQL_Title': 'Zone_1A',
+                        'SQL_Title': 'Zone_1',
                         'GUI_Label': 'Zone 1: Kitchen',
                         'GUI_Val': None,
                         'GUI_Default': str(0),
@@ -1858,7 +1858,7 @@ tm_ZONE_Gauge_count = 80
 tm_ZONE_Gauge_major = 10
 gauge_max_ZONE_Gauge = 8000
 gauge_min_ZONE_Gauge = 0
-frm_ZONE_Gauge_title = 'HP+Solar Wth'
+frm_ZONE_Gauge_title = 'Last HR: HP+Solar (Wth)'
 
 dict_ZONE_Gauge_Frame_Dims = {'frm_width': frmZONEGaugeWidth,
                                 'frm_height': frmZONEGaugeHeight,

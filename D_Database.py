@@ -413,10 +413,14 @@ class manage_database:
                     strField = dictInstructions['Solar_Inputs']['GUI_Information']['Heat_load']['SQL_Title']
                     strTable = dictInstructions['Solar_Inputs']['GUI_Information']['Heat_load']['SQL_Table']
                     Wh_solar = self.sum_query_between_times(lstLastHR[2], lstLastHR[3], lstLastHR[4], lstLastHR[5], strField, strTable)
+                    if Wh_solar == None:
+                        Wh_solar = 0
                 if dictInstructions['User_Inputs']['Heat_Pump'] == True:
                     strField = dictInstructions['HP_Inputs']['GUI_Information']['Heat_load']['SQL_Title']
                     strTable = dictInstructions['HP_Inputs']['GUI_Information']['Heat_load']['SQL_Table']
                     Wh_HP = self.sum_query_between_times(lstLastHR[2], lstLastHR[3], lstLastHR[4], lstLastHR[5], strField, strTable)
+                    if Wh_HP == None:
+                        Wh_HP = 0
                 Wh_Combined = Wh_solar + Wh_HP #As only 1 hour has been looked back the Wh = Wth
                 BMS_GUI.Zone_Gauge.add_gauge_line(Wh_Combined)
 
@@ -453,7 +457,8 @@ class manage_database:
                                     if i != 4: #Not zone data
                                         fltTotalVal = fltTotalVal + lstLastMin[j]
                                     else: #For Zones - if it's been on when read then add 1 or else add zero. Av. will provide % over minute
-                                        if fltTotalVal == "ON":
+                                        strOnOff = lstLastMin[j]
+                                        if strOnOff == "ON":
                                             fltTotalVal = 1 + fltTotalVal
                                         else:
                                             fltTotalVal = 0 + fltTotalVal
@@ -572,6 +577,12 @@ class manage_database:
                                     fltDayTotal = 0
                                 lstXY = [x_hr, fltDayTotal]
                             else:
+                                    if i == 4: # zone
+                                        fltMultiple = dictInstructions[lstTech[i]]['GUI_Information'][key]['ID'] + 1
+                                        if avOutput != 0:
+                                            avOutput = fltMultiple - ((1-avOutput) * 0.5)
+                                        else:
+                                            avOutput = fltMultiple - 0.5
                                     lstXY = [x_hr, avOutput]
 
                             lstGphInfoUpdate = chk_time.Check_Time_4_Graph(lstGphInfo[0], lstGphInfo[1])

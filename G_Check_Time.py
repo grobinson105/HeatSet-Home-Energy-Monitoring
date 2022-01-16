@@ -19,7 +19,7 @@ def Check_Time_4_Store(bytLoop, bytPrevMin): #Provided in minutes with maximum o
 def Check_Time_4_Graph(bytLoop, bytPrevMin): #Provided in minutes with maximum of hourly (i.e. 60)
     current_tm = dt.datetime.now()
     intMin = current_tm.minute
-    lstGraphUpdateMins = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+    lstGraphUpdateMins = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 59]
 	
     if intMin != bytPrevMin:
         bytLoop = 0
@@ -36,7 +36,7 @@ def Check_Time_4_Graph(bytLoop, bytPrevMin): #Provided in minutes with maximum o
 def Check_Time_4_heat_xchange(): #Provided in minutes with maximum of hourly (i.e. 60)
     current_tm = dt.datetime.now(tz=timezone.utc)
     intMin = current_tm.minute
-    lstGraphUpdateMins = [4,9,14,19,24,29,35,39,44,49,54]
+    lstGraphUpdateMins = [4,9,14,19,24,29,35,39,44,49,54,58]
     bytListMin = len(lstGraphUpdateMins) + 1
 
     for i in range(0,len(lstGraphUpdateMins)):
