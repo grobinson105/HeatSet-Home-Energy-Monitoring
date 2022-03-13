@@ -122,7 +122,16 @@ SETP 8: Set up a daily reboot
 	
 	exit the terminal
 
-STEP 9: Finish
+STEP 9: Set resolution
+	
+	I've had some problems with the VNC server not being able to display the desktop. I think this is a result of not fixing the screen resolution.
+	When you use multiple devices it causes the desktop environment issues as to which resoultion to settle on, or something along those lines.
+	To manage this do the following:
+	A. 	Open the terminal
+	B. 	enter: sudo raspi-config
+	C.	Display options -> Resolution. Then select a resolution mode, one website suggested selecting 1280x720. Save and finish.
+	
+STEP 10: Finish
 
 	Reboot the pi (see step 4) and the BMS software should now be running - happy home energy monitoring!
 
