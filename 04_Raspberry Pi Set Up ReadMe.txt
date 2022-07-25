@@ -41,6 +41,10 @@ STEP 3: Mount a USB flashdrive for data logging:
 	
 	https://www.raspberrypi-spy.co.uk/2014/05/how-to-mount-a-usb-flash-disk-on-the-raspberry-pi/
 	
+	Note that you need to set up the automount section of the instructions so that it will mount correctly each time the system restarts. If you do
+	not know your user id (UID) or group id (GID) type "id" in the command line and you can use the numeric value instead of the written ID when
+	mounting (e.g. 1000:1000 vs. pi:pi)
+	
 	When you have created the drive you need to update variable "dbLoc" in A_Initialise.py to the destination directory that you 
 	have created. The default is: '/media/HeatSet_data/'.
 
