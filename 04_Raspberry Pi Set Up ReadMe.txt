@@ -113,18 +113,9 @@ SETP 8: Set up a daily reboot
 
 	I feel that the code starts to slow down after several weeks of use. As such I have introduced a daily reboot of the system to 
 	flush out any issues. To set this up enter the following into the consol
-	$ sudo -i
-	$ crontab -e
-	In the crontab file navigate down to a free line and enter:
 	
-	0 0 * * * reboot
-	
-	This will reboot the machine at midnight each night.
-	
-	Press CTR X
-	Press Y and ENTER
-	
-	exit the terminal
+	Follow the istructions in the following forum: https://forums.raspberrypi.com/viewtopic.php?t=126106
+	(Note that in the crontab large gaps in represents a tab and small gaps)
 
 STEP 9: Set resolution
 	
